@@ -36,6 +36,6 @@ Step 6:
 Add reset form button which will appear next to submit button only if any input in form has a value. 
 Click on reset button should clear the form. 
 
-Please host your solution in a private repo - you can use https://bitbucket.org - and grant access to following logins: "emq" and "pendzela".
+Please host your solution in a private repo - you can use https://bitbucket.org - and grant access to following logins: "meal" and "pendzela".
 
 Good luck !
