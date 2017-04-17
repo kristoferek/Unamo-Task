@@ -25,23 +25,17 @@ export class Footer extends React.Component {
     }
 }
 
-/** Generates limited table of records with ability to remove them. */
-/** On props update adds new record at the beginning and fires handleListLength */
+/* Generates table of records with removing feature. */
+
 class UsersTable extends React.Component {
   constructor(props){
     super(props);
-    this.state = {
-      records: this.props.records,
-      newRecord: this.props.newRecord,
-    };
   }
 
-  render(){
-    console.log("userlislength", this.state.records.length);
-    const row = [];
-    let arr = this.state.records.slice();
-    arr.forEach((user, index) =>{
-      row.push(<tr key={index} id={index}>
+  constructRows = (array)=>{
+    let rows = [];
+    array.forEach((user, index) =>{
+      rows.push(<tr key={index} id={index}>
         <td>
           {index+1}
         </td>
@@ -52,13 +46,15 @@ class UsersTable extends React.Component {
           {user.email}
         </td>
         <td>
-          <div className="remove" onClick={(event, index) =>{
-            this.props.removeRecord(event, index);
-            }}>x</div>
+          <div className="remove" onClick={(e)=>this.props.removeRecord(event, index)}>x</div>
         </td>
       </tr>);
     });
+    return rows;
+  }
 
+  render(){
+    // console.log("UsersTable", this.state);
     return <table>
       <thead>
         <tr>
@@ -69,13 +65,14 @@ class UsersTable extends React.Component {
         </tr>
       </thead>
       <tbody>
-        {row}
+        {this.constructRows(this.props.records)}
       </tbody>
     </table>
   }
 }
 
-/** Generates user list with ability to add, remove new users acccording to userLimit and userArray props */
+/* *** Generates user list with ability to add, remove new users *** */
+/* *** acccording to userLimit and userArray props *** */
 export class UserList extends React.Component {
   constructor(props){
     super(props);
@@ -89,11 +86,6 @@ export class UserList extends React.Component {
       currentUserListLength: 0,
       userLimit: this.props.userLimit,
       userAddedSuccess: false,
-      newUser: {
-        id: undefined,
-        name: undefined,
-        email: undefined,
-      }
     };
   }
 
@@ -123,9 +115,28 @@ export class UserList extends React.Component {
     this.initializeUserArr(this.props.userList, this.props.userLimit);
   }
 
-  // Checks if record exists in list and if so adds it an the beginning
+  // Updates state info about successful adding user to the list to show message
+  handleUserAddedSuccess = (logical) =>{
+    this.setState({
+      userAddedSuccess: logical
+    })
+  }
+
+  checkUserAddedSuccess = () =>{
+    return this.state.userAddedSuccess
+  }
+
+  // Cares about actual this.state list length
+  listLimitExceeded = ()=>{
+    return this.state.currentUserListLength >= this.state.userLimit;
+  }
+
+  /* ***Adds records to the list.Checks if record exists*** */
+  /* ***in list and if so adds it at the beginning*** */
   addNewRecord = (record) => {
     let existInArray = false;
+
+    // Checks if record email already exists in the list
     for (var i = 0; i < this.state.records.length; i++) {
       if (this.state.records[i].email === record.email) {
         existInArray = true;
@@ -133,81 +144,55 @@ export class UserList extends React.Component {
       }
     }
 
+    // If record email is unique adds record at the beginning of the list
     if (existInArray === false) {
       let arrayTemp = this.state.records.slice();
       arrayTemp.splice(0,0,record);
       this.setState({
-        records: arrayTemp
-      }, this.props.handleListLength(this.state.records.length))
-      this.props.handleUserAddedSuccess();
+        records: arrayTemp,
+        currentID: record.id,
+        currentUserListLength: arrayTemp.length,
+        userAddedSuccess: true
+      });
+      // Updates state info about list length
+      // Updates state info about operation success
 
     } else {
       console.log('Błąd. Ten record juz jest w tabeli:', record);
     }
   }
 
-  // On props update fires addNewRecord() and fires handleListLength
-  componentWillReceiveProps(nextProps) {
-    this.addNewRecord(nextProps.newRecord);
-  }
-
-  // Removes record from records (usersList)
-  removeRecord = (e, index) =>{
+  /* Removes record from records (usersList) */
+  removeRecord = (event, index) =>{
+    console.log("RemovRecord index:", index);
     let arrayTemp = this.state.records.slice();
     arrayTemp.splice(index,1);
     this.setState({
-      records: arrayTemp
-    }, this.props.handleListLength(this.state.records.length));
+      records: arrayTemp,
+      currentUserListLength: arrayTemp.length
+    });
+
   }
 
-  // Updates this.state newUser with passed user and increases currentID by 1
-  handleNewUser = (user) =>{
-    this.setState({
-      newUser: user,
-      currentID: user.id,
-    })
-  }
-
-  handleUserAddedSuccess = () =>{
-    this.setState({
-      userAddedSuccess: true
-    })
-  }
-
-  handleUserAddedReset = () =>{
-    this.setState({
-      userAddedSuccess: false
-    })
-  }
-
-  // Cares about actual this.state list length
-  handleListLength = (number)=>{
-    this.setState({
-      currentUserListLength: number,
-    })
-  }
-
-  // Generates user list table with buttons above to add new users
-  // Navigation handles new user form and fires handleNewUser if correct input and userLimit not exceeded
-  // UserTable handles userList allowing removing users and adding if this.state.newUser changes
+/* ***Generates user list table with buttons above to add new users*** */
+  // Navigation handles new user form
+  // UserTable handles user list allowing removing and adding users
   render() {
-    console.log("UserList", this.state);
+    // console.log("UserList", this.state);
     return <div className="row userList">
       <Navigation
         currentID={this.state.currentID}
-        limit={this.state.userLimit}
-        currentUserListLength={this.state.currentUserListLength}
-        userAddedSuccess={this.state.userAddedSuccess}
-        handleNewUser={this.handleNewUser}
-        handleListLength={this.handleListLength}
-        handleUserAddedReset={this.handleUserAddedReset}/>
+
+        addNewRecord={this.addNewRecord}
+        checkUserAddedSuccess={this.checkUserAddedSuccess }
+        handleUserAddedSuccess={this.handleUserAddedSuccess}
+        listLimitExceeded={this.listLimitExceeded}
+      />
 
       <UsersTable
         records={this.state.records}
-        newRecord={this.state.newUser}
-        limit={this.state.userLimit}
-        handleListLength={this.handleListLength}
-        handleUserAddedSuccess={this.handleUserAddedSuccess}/>
+        removeRecord={this.removeRecord}
+      />
     </div>
   }
 }

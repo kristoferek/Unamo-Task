@@ -13,7 +13,7 @@ export class Button extends React.Component {
       text: this.props.text,
       icon: this.props.icon ? this.props.icon : "",
       inverse: this.props.inverse,
-      disable: this.props.disable,
+      buttonDisable: this.props.buttonDisable,
       actualClass: "button"
     }
   }
@@ -21,7 +21,7 @@ export class Button extends React.Component {
   setClass = (newState)=>{
     let classVar="button";
     newState.inverse ? classVar = classVar + " inverse" : null;
-    newState.disable ? classVar= classVar + " disabled" : null;
+    newState.buttonDisable ? classVar= classVar + " disabled" : null;
     this.setState({
       actualClass: classVar
     });
@@ -29,16 +29,16 @@ export class Button extends React.Component {
 
   componentWillMount(){
     this.setClass(this.props);
-    console.log("Nextprops button ", this.props);
+    // console.log("Nextprops button ", this.props);
   }
 
-  componentWillReceiveProps(nextProps){
-    this.setClass(nextProps);
-    console.log("Nextprops button ", nextProps);
-  }
+  // componentWillReceiveProps(nextProps){
+  //   this.setClass(nextProps);
+  //   // console.log("Nextprops button ", nextProps);
+  // }
 
   render() {
-    console.log("State button ", this.state);
+    console.log("Button ", this.state);
     return <div
       className={this.state.actualClass}
       onClick={this.state.disable ? null : this.props.handleClick}>
@@ -54,31 +54,17 @@ class AddUserButton extends React.Component {
   constructor(props){
     super(props);
     this.state = {
-      currentID: this.props.currentID,
-      currentUserListLength: this.props.currentUserListLength,
-      buttonDisable: this.props.buttonDisable,
-      limit: this.props.limit,
-      userAddedSuccess: this.props.userAddedSuccess,
     };
-  }
-
-  // componentWillReceiveProps(nextProps) {
-  //   this.setState({
-  //     buttonDisable: (this.nextProps.disable)
-  //   })
-  // }
-
-  handleSubmit = (event) =>{
-    event.preventDefault();
-    this.handleDisplayInput();
   }
 
   render(){
     console.log("AddUserButton: ", this.state);
     return <div className="AddUserButton">
       <Button icon="+" inverse={false}
-        disable={this.state.buttonDisable}
-        handleClick={this.props.handleDisplayInput} text="Add User" />
+        buttonDisable={this.props.listLimitExceeded}
+        handleClick={this.props.handleDisplayInput}
+        text="Add User"
+      />
       <SuccessMessage />
       <WarningMessage />
     </div>
@@ -123,37 +109,56 @@ class InputUser extends React.Component {
   // Handle Submit button
   handleSubmit = (event) => {
     event.preventDefault();
-    if (this.state.inputEmailValue.indexOf("@") < 0) {
-      this.setState({
-        emailWarning: ""
-      })
-    } else if (this.state.inputNameValue.length > 20) {
-      this.setState({
-        nameWarning: ""
-      })
-    } else {
+
+    // Toggle input email validation
+    let incorrectEmail = this.state.inputEmailValue.indexOf("@") < 0;
+    this.setState({
+      emailWarning: incorrectEmail ? "" : "hidden"
+    })
+
+    // Toggle input name validation
+    let incorrectName = this.state.inputNameValue.length > 20;
+    this.setState({
+      nameWarning: incorrectName ? "" : "hidden"
+    })
+
+    // If email and name inputs are correct add user to list
+    // and increase currentID
+    if (!(incorrectEmail && incorrectName)) {
       const newUser = {
-        id: this.state.currentID,
+        id: this.state.currentID + 1,
         name: this.state.inputNameValue,
         email: this.state.inputEmailValue,
       };
-      this.props.handleNewUser(newUser);
-
-      this.setState({
-        emailWarning: "hidden",
-        nameWarning: "hidden"
-      });
+      this.props.addNewRecord(newUser);
     }
   }
 
   render(){
     return <div className="inputUser">
-      <input type="text" name="userName" placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}/>
-      <input type="text" name="userEmail" placeholder="Email..." value={this.state.inputEmailValue} onChange={(e)=>this.handleEmailChange(e)}/>
-      <Button inverse={true} handleClick={this.handleSubmit} text="Submit"/>
-      <div id="reset"><a href="#" onClick={this.handleInputReset}>Reset fields</a></div>
-      <WarningValidateEmail className={this.state.nameWarning}/>
-      <WarningValidateEmail className={this.state.mailWarning}/>
+      <input
+        type="text"
+        name="userName"
+        placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}
+      />
+      <input
+        type="text"
+        name="userEmail"
+        placeholder="Email..." value={this.state.inputEmailValue}
+        onChange={(e)=>this.handleEmailChange(e)}
+      />
+      <Button
+        inverse={true}
+        handleClick={this.handleSubmit}
+        text="Submit"
+      />
+      <div id="reset">
+        <a href="#" onClick={this.handleInputReset}>
+          Reset fields
+        </a>
+      </div>
+      <WarningValidateEmail isHidden={this.state.nameWarning}/>
+      <WarningValidateEmail isHidden={this.state.mailWarning}/>
     </div>
   }
 }
@@ -164,54 +169,41 @@ export class Navigation extends React.Component {
     super(props);
     this.state = {
       currentID: this.props.currentID,
-      currentUserListLength: this.props.currentUserListLength,
-      limit: this.props.limit,
-      userAddedSuccess: this.props.userAddedSuccess,
       displayInput: false,
-      limitExeeded: false,
     };
   }
 
-  componentWillMount(){
-    if ( this.props.currentUserListLength < this.props.limit ) {
-      this.setState({
-        limitExeeded: false,
-      })
-    } else {
-      this.setState({
-        limitExeeded: true,
-      })
-    }
-  }
-
-  handleDisplayInput = () =>{
+  // Toggles displaying InputUser or AddUserButton
+  handleDisplayInput = (logical) =>{
     // console.log("this.state.displayInput", this.state.displayInput);
     this.setState({
-      displayInput: !this.state.displayInput,
+      displayInput: logical,
     })
   }
 
   render(){
-    console.log("Navigation", this.state);
+    // console.log("Navigation", this.state);
     if (this.state.displayInput) {
       return <div className="addForm">
         <InputUser
           currentID={this.state.currentID}
+
+          addNewRecord={this.addNewRecord}
           handleDisplayInput={this.handleDisplayInput}
-          handleNewUser={this.props.handleNewUser}
-          />
+          handleUserAddedSuccess={this.handleUserAddedSuccess}
+          listLimitExceeded={this.listLimitExceeded}
+        />
       </div>
     } else {
       return <div className="addForm">
         <AddUserButton
           inverse={false}
-          buttonDisable={this.state.limitExeeded}
-          currentID={this.state.currentID}
-          currentUserListLength={this.state.currentUserListLength}
-          limit={this.state.limit}
-          userAddedSuccess={this.state.userAddedSuccess}
+
+          checkUserAddedSuccess={this.checkUserAddedSuccess}
           handleDisplayInput={this.handleDisplayInput}
-          />
+          handleUserAddedSuccess={this.handleUserAddedSuccess}
+          listLimitExceeded={this.listLimitExceeded}
+        />
       </div>
     }
   }

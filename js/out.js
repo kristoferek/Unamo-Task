@@ -9803,9 +9803,7 @@ var Footer = exports.Footer = function (_React$Component2) {
   return Footer;
 }(_react2.default.Component);
 
-/** Generates limited table of records with ability to remove them. */
-/** On props update adds new record at the beginning and fires handleListLength */
-
+/* Generates table of records with removing feature. */
 
 var UsersTable = function (_React$Component3) {
   _inherits(UsersTable, _React$Component3);
@@ -9815,23 +9813,10 @@ var UsersTable = function (_React$Component3) {
 
     var _this3 = _possibleConstructorReturn(this, (UsersTable.__proto__ || Object.getPrototypeOf(UsersTable)).call(this, props));
 
-    _this3.state = {
-      records: _this3.props.records,
-      newRecord: _this3.props.newRecord
-    };
-    return _this3;
-  }
-
-  _createClass(UsersTable, [{
-    key: 'render',
-    value: function render() {
-      var _this4 = this;
-
-      console.log("userlislength", this.state.records.length);
-      var row = [];
-      var arr = this.state.records.slice();
-      arr.forEach(function (user, index) {
-        row.push(_react2.default.createElement(
+    _this3.constructRows = function (array) {
+      var rows = [];
+      array.forEach(function (user, index) {
+        rows.push(_react2.default.createElement(
           'tr',
           { key: index, id: index },
           _react2.default.createElement(
@@ -9854,15 +9839,24 @@ var UsersTable = function (_React$Component3) {
             null,
             _react2.default.createElement(
               'div',
-              { className: 'remove', onClick: function onClick(event, index) {
-                  _this4.props.removeRecord(event, index);
+              { className: 'remove', onClick: function onClick(e) {
+                  return _this3.props.removeRecord(event, index);
                 } },
               'x'
             )
           )
         ));
       });
+      return rows;
+    };
 
+    return _this3;
+  }
+
+  _createClass(UsersTable, [{
+    key: 'render',
+    value: function render() {
+      // console.log("UsersTable", this.state);
       return _react2.default.createElement(
         'table',
         null,
@@ -9893,7 +9887,7 @@ var UsersTable = function (_React$Component3) {
         _react2.default.createElement(
           'tbody',
           null,
-          row
+          this.constructRows(this.props.records)
         )
       );
     }
@@ -9902,7 +9896,8 @@ var UsersTable = function (_React$Component3) {
   return UsersTable;
 }(_react2.default.Component);
 
-/** Generates user list with ability to add, remove new users acccording to userLimit and userArray props */
+/* *** Generates user list with ability to add, remove new users *** */
+/* *** acccording to userLimit and userArray props *** */
 
 
 var UserList = exports.UserList = function (_React$Component4) {
@@ -9911,9 +9906,9 @@ var UserList = exports.UserList = function (_React$Component4) {
   function UserList(props) {
     _classCallCheck(this, UserList);
 
-    var _this5 = _possibleConstructorReturn(this, (UserList.__proto__ || Object.getPrototypeOf(UserList)).call(this, props));
+    var _this4 = _possibleConstructorReturn(this, (UserList.__proto__ || Object.getPrototypeOf(UserList)).call(this, props));
 
-    _this5.initializeUserArr = function (array, limit) {
+    _this4.initializeUserArr = function (array, limit) {
       var arrayTemp = [];
 
       // fills arrayTemp with id, name and email form array until its end or reached limit
@@ -9926,68 +9921,66 @@ var UserList = exports.UserList = function (_React$Component4) {
       }
 
       // sets this.state userArr and higherID
-      _this5.setState({
+      _this4.setState({
         records: arrayTemp,
         currentID: i,
         currentUserListLength: i
       });
     };
 
-    _this5.addNewRecord = function (record) {
+    _this4.handleUserAddedSuccess = function (logical) {
+      _this4.setState({
+        userAddedSuccess: logical
+      });
+    };
+
+    _this4.checkUserAddedSuccess = function () {
+      return _this4.state.userAddedSuccess;
+    };
+
+    _this4.listLimitExceeded = function () {
+      return _this4.state.currentUserListLength >= _this4.state.userLimit;
+    };
+
+    _this4.addNewRecord = function (record) {
       var existInArray = false;
-      for (var i = 0; i < _this5.state.records.length; i++) {
-        if (_this5.state.records[i].email === record.email) {
+
+      // Checks if record email already exists in the list
+      for (var i = 0; i < _this4.state.records.length; i++) {
+        if (_this4.state.records[i].email === record.email) {
           existInArray = true;
           break;
         }
       }
 
+      // If record email is unique adds record at the beginning of the list
       if (existInArray === false) {
-        var arrayTemp = _this5.state.records.slice();
+        var arrayTemp = _this4.state.records.slice();
         arrayTemp.splice(0, 0, record);
-        _this5.setState({
-          records: arrayTemp
-        }, _this5.props.handleListLength(_this5.state.records.length));
-        _this5.props.handleUserAddedSuccess();
+        _this4.setState({
+          records: arrayTemp,
+          currentID: record.id,
+          currentUserListLength: arrayTemp.length,
+          userAddedSuccess: true
+        });
+        // Updates state info about list length
+        // Updates state info about operation success
       } else {
         console.log('Błąd. Ten record juz jest w tabeli:', record);
       }
     };
 
-    _this5.removeRecord = function (e, index) {
-      var arrayTemp = _this5.state.records.slice();
+    _this4.removeRecord = function (event, index) {
+      console.log("RemovRecord index:", index);
+      var arrayTemp = _this4.state.records.slice();
       arrayTemp.splice(index, 1);
-      _this5.setState({
-        records: arrayTemp
-      }, _this5.props.handleListLength(_this5.state.records.length));
-    };
-
-    _this5.handleNewUser = function (user) {
-      _this5.setState({
-        newUser: user,
-        currentID: user.id
+      _this4.setState({
+        records: arrayTemp,
+        currentUserListLength: arrayTemp.length
       });
     };
 
-    _this5.handleUserAddedSuccess = function () {
-      _this5.setState({
-        userAddedSuccess: true
-      });
-    };
-
-    _this5.handleUserAddedReset = function () {
-      _this5.setState({
-        userAddedSuccess: false
-      });
-    };
-
-    _this5.handleListLength = function (number) {
-      _this5.setState({
-        currentUserListLength: number
-      });
-    };
-
-    _this5.state = {
+    _this4.state = {
       records: {
         id: "...",
         name: "Loading name...",
@@ -9995,15 +9988,10 @@ var UserList = exports.UserList = function (_React$Component4) {
       },
       currentID: 1,
       currentUserListLength: 0,
-      userLimit: _this5.props.userLimit,
-      userAddedSuccess: false,
-      newUser: {
-        id: undefined,
-        name: undefined,
-        email: undefined
-      }
+      userLimit: _this4.props.userLimit,
+      userAddedSuccess: false
     };
-    return _this5;
+    return _this4;
   }
 
   // Constructs this.state.usrArr according to passed array and length limit
@@ -10018,51 +10006,42 @@ var UserList = exports.UserList = function (_React$Component4) {
       this.initializeUserArr(this.props.userList, this.props.userLimit);
     }
 
-    // Checks if record exists in list and if so adds it an the beginning
-
-  }, {
-    key: 'componentWillReceiveProps',
-
-
-    // On props update fires addNewRecord() and fires handleListLength
-    value: function componentWillReceiveProps(nextProps) {
-      this.addNewRecord(nextProps.newRecord);
-    }
-
-    // Removes record from records (usersList)
-
-
-    // Updates this.state newUser with passed user and increases currentID by 1
+    // Updates state info about successful adding user to the list to show message
 
 
     // Cares about actual this.state list length
+
+
+    /* ***Adds records to the list.Checks if record exists*** */
+    /* ***in list and if so adds it at the beginning*** */
+
+
+    /* Removes record from records (usersList) */
 
   }, {
     key: 'render',
 
 
-    // Generates user list table with buttons above to add new users
-    // Navigation handles new user form and fires handleNewUser if correct input and userLimit not exceeded
-    // UserTable handles userList allowing removing users and adding if this.state.newUser changes
+    /* ***Generates user list table with buttons above to add new users*** */
+    // Navigation handles new user form
+    // UserTable handles user list allowing removing and adding users
     value: function render() {
-      console.log("UserList", this.state);
+      // console.log("UserList", this.state);
       return _react2.default.createElement(
         'div',
         { className: 'row userList' },
         _react2.default.createElement(_form.Navigation, {
           currentID: this.state.currentID,
-          limit: this.state.userLimit,
-          currentUserListLength: this.state.currentUserListLength,
-          userAddedSuccess: this.state.userAddedSuccess,
-          handleNewUser: this.handleNewUser,
-          handleListLength: this.handleListLength,
-          handleUserAddedReset: this.handleUserAddedReset }),
+
+          addNewRecord: this.addNewRecord,
+          checkUserAddedSuccess: this.checkUserAddedSuccess,
+          handleUserAddedSuccess: this.handleUserAddedSuccess,
+          listLimitExceeded: this.listLimitExceeded
+        }),
         _react2.default.createElement(UsersTable, {
           records: this.state.records,
-          newRecord: this.state.newUser,
-          limit: this.state.userLimit,
-          handleListLength: this.handleListLength,
-          handleUserAddedSuccess: this.handleUserAddedSuccess })
+          removeRecord: this.removeRecord
+        })
       );
     }
   }]);
@@ -10205,7 +10184,7 @@ var Button = exports.Button = function (_React$Component) {
     _this.setClass = function (newState) {
       var classVar = "button";
       newState.inverse ? classVar = classVar + " inverse" : null;
-      newState.disable ? classVar = classVar + " disabled" : null;
+      newState.buttonDisable ? classVar = classVar + " disabled" : null;
       _this.setState({
         actualClass: classVar
       });
@@ -10215,7 +10194,7 @@ var Button = exports.Button = function (_React$Component) {
       text: _this.props.text,
       icon: _this.props.icon ? _this.props.icon : "",
       inverse: _this.props.inverse,
-      disable: _this.props.disable,
+      buttonDisable: _this.props.buttonDisable,
       actualClass: "button"
     };
     return _this;
@@ -10225,18 +10204,18 @@ var Button = exports.Button = function (_React$Component) {
     key: 'componentWillMount',
     value: function componentWillMount() {
       this.setClass(this.props);
-      console.log("Nextprops button ", this.props);
+      // console.log("Nextprops button ", this.props);
     }
-  }, {
-    key: 'componentWillReceiveProps',
-    value: function componentWillReceiveProps(nextProps) {
-      this.setClass(nextProps);
-      console.log("Nextprops button ", nextProps);
-    }
+
+    // componentWillReceiveProps(nextProps){
+    //   this.setClass(nextProps);
+    //   // console.log("Nextprops button ", nextProps);
+    // }
+
   }, {
     key: 'render',
     value: function render() {
-      console.log("State button ", this.state);
+      console.log("Button ", this.state);
       return _react2.default.createElement(
         'div',
         {
@@ -10267,26 +10246,9 @@ var AddUserButton = function (_React$Component2) {
 
     var _this2 = _possibleConstructorReturn(this, (AddUserButton.__proto__ || Object.getPrototypeOf(AddUserButton)).call(this, props));
 
-    _this2.handleSubmit = function (event) {
-      event.preventDefault();
-      _this2.handleDisplayInput();
-    };
-
-    _this2.state = {
-      currentID: _this2.props.currentID,
-      currentUserListLength: _this2.props.currentUserListLength,
-      buttonDisable: _this2.props.buttonDisable,
-      limit: _this2.props.limit,
-      userAddedSuccess: _this2.props.userAddedSuccess
-    };
+    _this2.state = {};
     return _this2;
   }
-
-  // componentWillReceiveProps(nextProps) {
-  //   this.setState({
-  //     buttonDisable: (this.nextProps.disable)
-  //   })
-  // }
 
   _createClass(AddUserButton, [{
     key: 'render',
@@ -10296,8 +10258,10 @@ var AddUserButton = function (_React$Component2) {
         'div',
         { className: 'AddUserButton' },
         _react2.default.createElement(Button, { icon: '+', inverse: false,
-          disable: this.state.buttonDisable,
-          handleClick: this.props.handleDisplayInput, text: 'Add User' }),
+          buttonDisable: this.props.listLimitExceeded,
+          handleClick: this.props.handleDisplayInput,
+          text: 'Add User'
+        }),
         _react2.default.createElement(_component.SuccessMessage, null),
         _react2.default.createElement(_component.WarningMessage, null)
       );
@@ -10339,26 +10303,28 @@ var InputUser = function (_React$Component3) {
 
     _this3.handleSubmit = function (event) {
       event.preventDefault();
-      if (_this3.state.inputEmailValue.indexOf("@") < 0) {
-        _this3.setState({
-          emailWarning: ""
-        });
-      } else if (_this3.state.inputNameValue.length > 20) {
-        _this3.setState({
-          nameWarning: ""
-        });
-      } else {
+
+      // Toggle input email validation
+      var incorrectEmail = _this3.state.inputEmailValue.indexOf("@") < 0;
+      _this3.setState({
+        emailWarning: incorrectEmail ? "" : "hidden"
+      });
+
+      // Toggle input name validation
+      var incorrectName = _this3.state.inputNameValue.length > 20;
+      _this3.setState({
+        nameWarning: incorrectName ? "" : "hidden"
+      });
+
+      // If email and name inputs are correct add user to list
+      // and increase currentID
+      if (!(incorrectEmail && incorrectName)) {
         var newUser = {
-          id: _this3.state.currentID,
+          id: _this3.state.currentID + 1,
           name: _this3.state.inputNameValue,
           email: _this3.state.inputEmailValue
         };
-        _this3.props.handleNewUser(newUser);
-
-        _this3.setState({
-          emailWarning: "hidden",
-          nameWarning: "hidden"
-        });
+        _this3.props.addNewRecord(newUser);
       }
     };
 
@@ -10392,13 +10358,26 @@ var InputUser = function (_React$Component3) {
       return _react2.default.createElement(
         'div',
         { className: 'inputUser' },
-        _react2.default.createElement('input', { type: 'text', name: 'userName', placeholder: 'Name...', value: this.state.inputNameValue, onChange: function onChange(e) {
+        _react2.default.createElement('input', {
+          type: 'text',
+          name: 'userName',
+          placeholder: 'Name...', value: this.state.inputNameValue, onChange: function onChange(e) {
             return _this4.handleNameChange(e);
-          } }),
-        _react2.default.createElement('input', { type: 'text', name: 'userEmail', placeholder: 'Email...', value: this.state.inputEmailValue, onChange: function onChange(e) {
+          }
+        }),
+        _react2.default.createElement('input', {
+          type: 'text',
+          name: 'userEmail',
+          placeholder: 'Email...', value: this.state.inputEmailValue,
+          onChange: function onChange(e) {
             return _this4.handleEmailChange(e);
-          } }),
-        _react2.default.createElement(Button, { inverse: true, handleClick: this.handleSubmit, text: 'Submit' }),
+          }
+        }),
+        _react2.default.createElement(Button, {
+          inverse: true,
+          handleClick: this.handleSubmit,
+          text: 'Submit'
+        }),
         _react2.default.createElement(
           'div',
           { id: 'reset' },
@@ -10408,8 +10387,8 @@ var InputUser = function (_React$Component3) {
             'Reset fields'
           )
         ),
-        _react2.default.createElement(_component.WarningValidateEmail, { className: this.state.nameWarning }),
-        _react2.default.createElement(_component.WarningValidateEmail, { className: this.state.mailWarning })
+        _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.nameWarning }),
+        _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
       );
     }
   }]);
@@ -10428,49 +10407,38 @@ var Navigation = exports.Navigation = function (_React$Component4) {
 
     var _this5 = _possibleConstructorReturn(this, (Navigation.__proto__ || Object.getPrototypeOf(Navigation)).call(this, props));
 
-    _this5.handleDisplayInput = function () {
+    _this5.handleDisplayInput = function (logical) {
       // console.log("this.state.displayInput", this.state.displayInput);
       _this5.setState({
-        displayInput: !_this5.state.displayInput
+        displayInput: logical
       });
     };
 
     _this5.state = {
       currentID: _this5.props.currentID,
-      currentUserListLength: _this5.props.currentUserListLength,
-      limit: _this5.props.limit,
-      userAddedSuccess: _this5.props.userAddedSuccess,
-      displayInput: false,
-      limitExeeded: false
+      displayInput: false
     };
     return _this5;
   }
 
+  // Toggles displaying InputUser or AddUserButton
+
+
   _createClass(Navigation, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      if (this.props.currentUserListLength < this.props.limit) {
-        this.setState({
-          limitExeeded: false
-        });
-      } else {
-        this.setState({
-          limitExeeded: true
-        });
-      }
-    }
-  }, {
     key: 'render',
     value: function render() {
-      console.log("Navigation", this.state);
+      // console.log("Navigation", this.state);
       if (this.state.displayInput) {
         return _react2.default.createElement(
           'div',
           { className: 'addForm' },
           _react2.default.createElement(InputUser, {
             currentID: this.state.currentID,
+
+            addNewRecord: this.addNewRecord,
             handleDisplayInput: this.handleDisplayInput,
-            handleNewUser: this.props.handleNewUser
+            handleUserAddedSuccess: this.handleUserAddedSuccess,
+            listLimitExceeded: this.listLimitExceeded
           })
         );
       } else {
@@ -10479,12 +10447,11 @@ var Navigation = exports.Navigation = function (_React$Component4) {
           { className: 'addForm' },
           _react2.default.createElement(AddUserButton, {
             inverse: false,
-            buttonDisable: this.state.limitExeeded,
-            currentID: this.state.currentID,
-            currentUserListLength: this.state.currentUserListLength,
-            limit: this.state.limit,
-            userAddedSuccess: this.state.userAddedSuccess,
-            handleDisplayInput: this.handleDisplayInput
+
+            checkUserAddedSuccess: this.checkUserAddedSuccess,
+            handleDisplayInput: this.handleDisplayInput,
+            handleUserAddedSuccess: this.handleUserAddedSuccess,
+            listLimitExceeded: this.listLimitExceeded
           })
         );
       }
