@@ -19,9 +19,7 @@ export class Header extends React.Component {
 // generates Footer (this time empty)
 export class Footer extends React.Component {
     render() {
-        return <div className="row footer">
-
-        </div>
+        return <div className="row footer"></div>
     }
 }
 
@@ -115,20 +113,22 @@ export class UserList extends React.Component {
     this.initializeUserArr(this.props.userList, this.props.userLimit);
   }
 
-  // Updates state info about successful adding user to the list to show message
-  handleUserAddedSuccess = (logical) =>{
-    this.setState({
-      userAddedSuccess: logical
-    })
-  }
-
-  checkUserAddedSuccess = () =>{
+  // Checks state info about successful adding user to the list to show message
+  userAddedSuccess = () =>{
     return this.state.userAddedSuccess
   }
 
-  // Cares about actual this.state list length
+  // Checks if user list length is lower then the userLimit
   listLimitExceeded = ()=>{
     return this.state.currentUserListLength >= this.state.userLimit;
+  }
+
+  // Toggles added user success state
+  handleUserAddedSuccess = (logical) =>{
+    // console.log("this.state.displayInput", this.state.displayInput);
+    this.setState({
+      userAddedSuccess: logical,
+    })
   }
 
   /* ***Adds records to the list.Checks if record exists*** */
@@ -152,11 +152,8 @@ export class UserList extends React.Component {
         records: arrayTemp,
         currentID: record.id,
         currentUserListLength: arrayTemp.length,
-        userAddedSuccess: true
       });
-      // Updates state info about list length
-      // Updates state info about operation success
-
+      this.handleUserAddedSuccess(true)
     } else {
       console.log('Błąd. Ten record juz jest w tabeli:', record);
     }
@@ -169,8 +166,9 @@ export class UserList extends React.Component {
     arrayTemp.splice(index,1);
     this.setState({
       records: arrayTemp,
-      currentUserListLength: arrayTemp.length
+      currentUserListLength: arrayTemp.length,
     });
+    this.handleUserAddedSuccess(false);
 
   }
 
@@ -184,9 +182,9 @@ export class UserList extends React.Component {
         currentID={this.state.currentID}
 
         addNewRecord={this.addNewRecord}
-        checkUserAddedSuccess={this.checkUserAddedSuccess }
-        handleUserAddedSuccess={this.handleUserAddedSuccess}
+        userAddedSuccess={this.userAddedSuccess}
         listLimitExceeded={this.listLimitExceeded}
+        handleUserAddedSuccess={this.handleUserAddedSuccess}
       />
 
       <UsersTable

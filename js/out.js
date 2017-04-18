@@ -6681,7 +6681,7 @@ module.exports = ReactNoopUpdateQueue;
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.WarningValidateName = exports.WarningValidateEmail = exports.WarningMessage = exports.SuccessMessage = exports.Domain = exports.Logo = undefined;
+exports.WarningValidateName = exports.WarningValidateEmail = exports.LimitExceededMessage = exports.SuccessMessage = exports.Domain = exports.Logo = undefined;
 
 var _createClass = function () { function defineProperties(target, props) { for (var i = 0; i < props.length; i++) { var descriptor = props[i]; descriptor.enumerable = descriptor.enumerable || false; descriptor.configurable = true; if ("value" in descriptor) descriptor.writable = true; Object.defineProperty(target, descriptor.key, descriptor); } } return function (Constructor, protoProps, staticProps) { if (protoProps) defineProperties(Constructor.prototype, protoProps); if (staticProps) defineProperties(Constructor, staticProps); return Constructor; }; }();
 
@@ -6761,7 +6761,7 @@ var SuccessMessage = exports.SuccessMessage = function (_React$Component3) {
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { className: "success" },
+        { className: "message " + this.props.isHidden },
         "You have Successfully added an user."
       );
     }
@@ -6770,27 +6770,28 @@ var SuccessMessage = exports.SuccessMessage = function (_React$Component3) {
   return SuccessMessage;
 }(_react2.default.Component);
 
-var WarningMessage = exports.WarningMessage = function (_React$Component4) {
-  _inherits(WarningMessage, _React$Component4);
+var LimitExceededMessage = exports.LimitExceededMessage = function (_React$Component4) {
+  _inherits(LimitExceededMessage, _React$Component4);
 
-  function WarningMessage() {
-    _classCallCheck(this, WarningMessage);
+  function LimitExceededMessage() {
+    _classCallCheck(this, LimitExceededMessage);
 
-    return _possibleConstructorReturn(this, (WarningMessage.__proto__ || Object.getPrototypeOf(WarningMessage)).apply(this, arguments));
+    return _possibleConstructorReturn(this, (LimitExceededMessage.__proto__ || Object.getPrototypeOf(LimitExceededMessage)).apply(this, arguments));
   }
 
-  _createClass(WarningMessage, [{
+  _createClass(LimitExceededMessage, [{
     key: "render",
     value: function render() {
+      console.log(this.props);
       return _react2.default.createElement(
         "div",
-        { className: "warning" },
+        { className: "message " + this.props.isHidden },
         "You can't add new user because of a limit."
       );
     }
   }]);
 
-  return WarningMessage;
+  return LimitExceededMessage;
 }(_react2.default.Component);
 
 var WarningValidateEmail = exports.WarningValidateEmail = function (_React$Component5) {
@@ -6807,7 +6808,7 @@ var WarningValidateEmail = exports.WarningValidateEmail = function (_React$Compo
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { id: "emailWarning" },
+        { className: "validate " + this.props.isHidden },
         "Please input a valid email."
       );
     }
@@ -6830,7 +6831,7 @@ var WarningValidateName = exports.WarningValidateName = function (_React$Compone
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { id: "nameWarning" },
+        { className: "validate " + this.props.isHidden },
         "Please name not longer than 20 characters."
       );
     }
@@ -9928,18 +9929,19 @@ var UserList = exports.UserList = function (_React$Component4) {
       });
     };
 
-    _this4.handleUserAddedSuccess = function (logical) {
-      _this4.setState({
-        userAddedSuccess: logical
-      });
-    };
-
-    _this4.checkUserAddedSuccess = function () {
+    _this4.userAddedSuccess = function () {
       return _this4.state.userAddedSuccess;
     };
 
     _this4.listLimitExceeded = function () {
       return _this4.state.currentUserListLength >= _this4.state.userLimit;
+    };
+
+    _this4.handleUserAddedSuccess = function (logical) {
+      // console.log("this.state.displayInput", this.state.displayInput);
+      _this4.setState({
+        userAddedSuccess: logical
+      });
     };
 
     _this4.addNewRecord = function (record) {
@@ -9960,11 +9962,9 @@ var UserList = exports.UserList = function (_React$Component4) {
         _this4.setState({
           records: arrayTemp,
           currentID: record.id,
-          currentUserListLength: arrayTemp.length,
-          userAddedSuccess: true
+          currentUserListLength: arrayTemp.length
         });
-        // Updates state info about list length
-        // Updates state info about operation success
+        _this4.handleUserAddedSuccess(true);
       } else {
         console.log('Błąd. Ten record juz jest w tabeli:', record);
       }
@@ -9978,6 +9978,7 @@ var UserList = exports.UserList = function (_React$Component4) {
         records: arrayTemp,
         currentUserListLength: arrayTemp.length
       });
+      _this4.handleUserAddedSuccess(false);
     };
 
     _this4.state = {
@@ -10006,10 +10007,13 @@ var UserList = exports.UserList = function (_React$Component4) {
       this.initializeUserArr(this.props.userList, this.props.userLimit);
     }
 
-    // Updates state info about successful adding user to the list to show message
+    // Checks state info about successful adding user to the list to show message
 
 
-    // Cares about actual this.state list length
+    // Checks if user list length is lower then the userLimit
+
+
+    // Toggles added user success state
 
 
     /* ***Adds records to the list.Checks if record exists*** */
@@ -10034,9 +10038,9 @@ var UserList = exports.UserList = function (_React$Component4) {
           currentID: this.state.currentID,
 
           addNewRecord: this.addNewRecord,
-          checkUserAddedSuccess: this.checkUserAddedSuccess,
-          handleUserAddedSuccess: this.handleUserAddedSuccess,
-          listLimitExceeded: this.listLimitExceeded
+          userAddedSuccess: this.userAddedSuccess,
+          listLimitExceeded: this.listLimitExceeded,
+          handleUserAddedSuccess: this.handleUserAddedSuccess
         }),
         _react2.default.createElement(UsersTable, {
           records: this.state.records,
@@ -10181,13 +10185,11 @@ var Button = exports.Button = function (_React$Component) {
 
     var _this = _possibleConstructorReturn(this, (Button.__proto__ || Object.getPrototypeOf(Button)).call(this, props));
 
-    _this.setClass = function (newState) {
-      var classVar = "button";
-      newState.inverse ? classVar = classVar + " inverse" : null;
-      newState.buttonDisable ? classVar = classVar + " disabled" : null;
-      _this.setState({
-        actualClass: classVar
-      });
+    _this.setClass = function () {
+      var classVar = _this.state.actualClass;
+      _this.state.inverse ? classVar = classVar + " inverse" : null;
+      _this.state.buttonDisable ? classVar = classVar + " disabled" : null;
+      return classVar;
     };
 
     _this.state = {
@@ -10200,18 +10202,19 @@ var Button = exports.Button = function (_React$Component) {
     return _this;
   }
 
+  // componentWillMount() {
+  //   this.setState({
+  //     buttonDisable: this.props.listLimitExceeded(),
+  //   })
+  // }
+
   _createClass(Button, [{
-    key: 'componentWillMount',
-    value: function componentWillMount() {
-      this.setClass(this.props);
-      // console.log("Nextprops button ", this.props);
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      this.setState({
+        buttonDisable: this.props.listLimitExceeded()
+      });
     }
-
-    // componentWillReceiveProps(nextProps){
-    //   this.setClass(nextProps);
-    //   // console.log("Nextprops button ", nextProps);
-    // }
-
   }, {
     key: 'render',
     value: function render() {
@@ -10219,8 +10222,8 @@ var Button = exports.Button = function (_React$Component) {
       return _react2.default.createElement(
         'div',
         {
-          className: this.state.actualClass,
-          onClick: this.state.disable ? null : this.props.handleClick },
+          className: this.setClass(),
+          onClick: this.state.buttonDisable ? null : this.props.handleClick },
         this.state.icon != "" ? _react2.default.createElement(
           'div',
           { className: 'icon' },
@@ -10246,11 +10249,55 @@ var AddUserButton = function (_React$Component2) {
 
     var _this2 = _possibleConstructorReturn(this, (AddUserButton.__proto__ || Object.getPrototypeOf(AddUserButton)).call(this, props));
 
-    _this2.state = {};
+    _this2.handleButtonDisabled = function () {
+      _this2.setState({
+        buttonDisable: _this2.props.listLimitExceeded()
+      });
+    };
+
+    _this2.handleLimitExceededMessage = function () {
+      _this2.setState({
+        isHiddenLimitExceededMessage: _this2.props.listLimitExceeded() ? "" : "hidden"
+      });
+    };
+
+    _this2.handleSuccessMessage = function () {
+      _this2.setState({
+        isHiddenSuccessMessage: _this2.props.userAddedSuccess() ? "" : "hidden"
+      });
+    };
+
+    _this2.handleSubmit = function () {
+      _this2.props.handleUserAddedSuccess(false);
+      if (_this2.props.listLimitExceeded()) {
+        _this2.handleButtonDisabled();
+        _this2.handleLimitExceededMessage();
+      } else {
+        _this2.props.handleDisplayInput(true);
+      }
+    };
+
+    _this2.state = {
+      isHiddenSuccessMessage: "hidden",
+      isHiddenLimitExceededMessage: "hidden",
+      buttonDisable: false
+    };
     return _this2;
   }
 
   _createClass(AddUserButton, [{
+    key: 'componentWillMount',
+    value: function componentWillMount() {
+      this.handleSuccessMessage();
+      // this.handleLimitExceededMessage();
+    }
+  }, {
+    key: 'componentWillReceiveProps',
+    value: function componentWillReceiveProps(nextProps) {
+      this.handleSuccessMessage();
+      this.handleLimitExceededMessage();
+    }
+  }, {
     key: 'render',
     value: function render() {
       console.log("AddUserButton: ", this.state);
@@ -10258,12 +10305,12 @@ var AddUserButton = function (_React$Component2) {
         'div',
         { className: 'AddUserButton' },
         _react2.default.createElement(Button, { icon: '+', inverse: false,
-          buttonDisable: this.props.listLimitExceeded,
-          handleClick: this.props.handleDisplayInput,
+          listLimitExceeded: this.props.listLimitExceeded,
+          handleClick: this.handleSubmit,
           text: 'Add User'
         }),
-        _react2.default.createElement(_component.SuccessMessage, null),
-        _react2.default.createElement(_component.WarningMessage, null)
+        _react2.default.createElement(_component.SuccessMessage, { isHidden: this.state.isHiddenSuccessMessage }),
+        _react2.default.createElement(_component.LimitExceededMessage, { isHidden: this.state.isHiddenLimitExceededMessage })
       );
     }
   }]);
@@ -10307,24 +10354,25 @@ var InputUser = function (_React$Component3) {
       // Toggle input email validation
       var incorrectEmail = _this3.state.inputEmailValue.indexOf("@") < 0;
       _this3.setState({
-        emailWarning: incorrectEmail ? "" : "hidden"
+        mailWarning: incorrectEmail ? "" : "hidden"
       });
 
       // Toggle input name validation
-      var incorrectName = _this3.state.inputNameValue.length > 20;
+      var incorrectName = _this3.state.inputNameValue.length > 20 || _this3.state.inputNameValue.length < 1;
       _this3.setState({
         nameWarning: incorrectName ? "" : "hidden"
       });
 
       // If email and name inputs are correct add user to list
       // and increase currentID
-      if (!(incorrectEmail && incorrectName)) {
+      if (!incorrectEmail && !incorrectName) {
         var newUser = {
           id: _this3.state.currentID + 1,
           name: _this3.state.inputNameValue,
           email: _this3.state.inputEmailValue
         };
         _this3.props.addNewRecord(newUser);
+        _this3.props.handleDisplayInput(false);
       }
     };
 
@@ -10332,7 +10380,7 @@ var InputUser = function (_React$Component3) {
       currentID: _this3.props.currentID + 1,
       inputNameValue: "",
       inputEmailValue: "",
-      emailWarning: "hidden",
+      mailWarning: "hidden",
       nameWarning: "hidden"
     };
     return _this3;
@@ -10358,23 +10406,33 @@ var InputUser = function (_React$Component3) {
       return _react2.default.createElement(
         'div',
         { className: 'inputUser' },
-        _react2.default.createElement('input', {
-          type: 'text',
-          name: 'userName',
-          placeholder: 'Name...', value: this.state.inputNameValue, onChange: function onChange(e) {
-            return _this4.handleNameChange(e);
-          }
-        }),
-        _react2.default.createElement('input', {
-          type: 'text',
-          name: 'userEmail',
-          placeholder: 'Email...', value: this.state.inputEmailValue,
-          onChange: function onChange(e) {
-            return _this4.handleEmailChange(e);
-          }
-        }),
-        _react2.default.createElement(Button, {
-          inverse: true,
+        _react2.default.createElement(
+          'div',
+          { className: 'validatedField' },
+          _react2.default.createElement('input', {
+            type: 'text',
+            name: 'userName',
+            placeholder: 'Name...', value: this.state.inputNameValue, onChange: function onChange(e) {
+              return _this4.handleNameChange(e);
+            }
+          }),
+          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
+        ),
+        _react2.default.createElement(
+          'div',
+          { className: 'validatedField' },
+          _react2.default.createElement('input', {
+            type: 'text',
+            name: 'userEmail',
+            placeholder: 'Email...', value: this.state.inputEmailValue,
+            onChange: function onChange(e) {
+              return _this4.handleEmailChange(e);
+            }
+          }),
+          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.nameWarning })
+        ),
+        _react2.default.createElement(Button, { inverse: false,
+          listLimitExceeded: this.props.listLimitExceeded,
           handleClick: this.handleSubmit,
           text: 'Submit'
         }),
@@ -10386,9 +10444,7 @@ var InputUser = function (_React$Component3) {
             { href: '#', onClick: this.handleInputReset },
             'Reset fields'
           )
-        ),
-        _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.nameWarning }),
-        _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
+        )
       );
     }
   }]);
@@ -10427,7 +10483,7 @@ var Navigation = exports.Navigation = function (_React$Component4) {
   _createClass(Navigation, [{
     key: 'render',
     value: function render() {
-      // console.log("Navigation", this.state);
+      console.log("Navigation", this.state);
       if (this.state.displayInput) {
         return _react2.default.createElement(
           'div',
@@ -10435,10 +10491,9 @@ var Navigation = exports.Navigation = function (_React$Component4) {
           _react2.default.createElement(InputUser, {
             currentID: this.state.currentID,
 
-            addNewRecord: this.addNewRecord,
+            addNewRecord: this.props.addNewRecord,
             handleDisplayInput: this.handleDisplayInput,
-            handleUserAddedSuccess: this.handleUserAddedSuccess,
-            listLimitExceeded: this.listLimitExceeded
+            listLimitExceeded: this.props.listLimitExceeded
           })
         );
       } else {
@@ -10448,10 +10503,10 @@ var Navigation = exports.Navigation = function (_React$Component4) {
           _react2.default.createElement(AddUserButton, {
             inverse: false,
 
-            checkUserAddedSuccess: this.checkUserAddedSuccess,
+            userAddedSuccess: this.props.userAddedSuccess,
             handleDisplayInput: this.handleDisplayInput,
-            handleUserAddedSuccess: this.handleUserAddedSuccess,
-            listLimitExceeded: this.listLimitExceeded
+            handleUserAddedSuccess: this.props.handleUserAddedSuccess,
+            listLimitExceeded: this.props.listLimitExceeded
           })
         );
       }

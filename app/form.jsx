@@ -1,7 +1,7 @@
 import React from 'react';
 import {
   SuccessMessage,
-  WarningMessage,
+  LimitExceededMessage,
   WarningValidateEmail,
   WarningValidateName
 } from './component.jsx';
@@ -18,30 +18,30 @@ export class Button extends React.Component {
     }
   }
 
-  setClass = (newState)=>{
-    let classVar="button";
-    newState.inverse ? classVar = classVar + " inverse" : null;
-    newState.buttonDisable ? classVar= classVar + " disabled" : null;
-    this.setState({
-      actualClass: classVar
-    });
-  }
-
-  componentWillMount(){
-    this.setClass(this.props);
-    // console.log("Nextprops button ", this.props);
-  }
-
-  // componentWillReceiveProps(nextProps){
-  //   this.setClass(nextProps);
-  //   // console.log("Nextprops button ", nextProps);
+  // componentWillMount() {
+  //   this.setState({
+  //     buttonDisable: this.props.listLimitExceeded(),
+  //   })
   // }
+
+  componentWillReceiveProps(nextProps) {
+    this.setState({
+      buttonDisable: this.props.listLimitExceeded(),
+    })
+  }
+
+  setClass = () => {
+    let classVar = this.state.actualClass;
+    this.state.inverse ? classVar = classVar + " inverse" : null;
+    this.state.buttonDisable ? classVar= classVar + " disabled" : null;
+    return classVar;
+  }
 
   render() {
     console.log("Button ", this.state);
     return <div
-      className={this.state.actualClass}
-      onClick={this.state.disable ? null : this.props.handleClick}>
+      className={this.setClass()}
+      onClick={this.state.buttonDisable ? null : this.props.handleClick}>
       {this.state.icon!=""
         ? <div className="icon">{this.state.icon}</div>
         : null}
@@ -54,19 +54,60 @@ class AddUserButton extends React.Component {
   constructor(props){
     super(props);
     this.state = {
+      isHiddenSuccessMessage: "hidden",
+      isHiddenLimitExceededMessage: "hidden",
+      buttonDisable: false,
     };
+  }
+
+  handleButtonDisabled = ()=>{
+    this.setState({
+      buttonDisable: this.props.listLimitExceeded(),
+    })
+  }
+
+  handleLimitExceededMessage = ()=>{
+   this.setState({
+     isHiddenLimitExceededMessage: this.props.listLimitExceeded() ? "" : "hidden",
+   })
+  }
+
+  handleSuccessMessage = ()=>{
+   this.setState({
+     isHiddenSuccessMessage: this.props.userAddedSuccess() ? "" : "hidden",
+   })
+  }
+
+  componentWillMount() {
+    this.handleSuccessMessage();
+    // this.handleLimitExceededMessage();
+  }
+
+  componentWillReceiveProps(nextProps) {
+    this.handleSuccessMessage();
+    this.handleLimitExceededMessage();
+  }
+
+  handleSubmit = () => {
+    this.props.handleUserAddedSuccess(false);
+    if (this.props.listLimitExceeded()){
+      this.handleButtonDisabled();
+      this.handleLimitExceededMessage();
+    } else {
+      this.props.handleDisplayInput(true);
+    }
   }
 
   render(){
     console.log("AddUserButton: ", this.state);
     return <div className="AddUserButton">
       <Button icon="+" inverse={false}
-        buttonDisable={this.props.listLimitExceeded}
-        handleClick={this.props.handleDisplayInput}
+        listLimitExceeded={this.props.listLimitExceeded}
+        handleClick={this.handleSubmit}
         text="Add User"
       />
-      <SuccessMessage />
-      <WarningMessage />
+      <SuccessMessage isHidden={this.state.isHiddenSuccessMessage}/>
+      <LimitExceededMessage isHidden={this.state.isHiddenLimitExceededMessage}/>
     </div>
   }
 }
@@ -79,7 +120,7 @@ class InputUser extends React.Component {
       currentID: this.props.currentID + 1,
       inputNameValue: "",
       inputEmailValue: "",
-      emailWarning: "hidden",
+      mailWarning: "hidden",
       nameWarning: "hidden",
     };
   }
@@ -113,42 +154,51 @@ class InputUser extends React.Component {
     // Toggle input email validation
     let incorrectEmail = this.state.inputEmailValue.indexOf("@") < 0;
     this.setState({
-      emailWarning: incorrectEmail ? "" : "hidden"
+      mailWarning: incorrectEmail ? "" : "hidden"
     })
 
     // Toggle input name validation
-    let incorrectName = this.state.inputNameValue.length > 20;
+    let incorrectName = this.state.inputNameValue.length > 20 || this.state.inputNameValue.length < 1 ;
     this.setState({
       nameWarning: incorrectName ? "" : "hidden"
     })
 
     // If email and name inputs are correct add user to list
     // and increase currentID
-    if (!(incorrectEmail && incorrectName)) {
+    if (!incorrectEmail && !incorrectName) {
       const newUser = {
         id: this.state.currentID + 1,
         name: this.state.inputNameValue,
         email: this.state.inputEmailValue,
       };
       this.props.addNewRecord(newUser);
+      this.props.handleDisplayInput(false);
     }
   }
 
   render(){
     return <div className="inputUser">
-      <input
-        type="text"
-        name="userName"
-        placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}
-      />
-      <input
-        type="text"
-        name="userEmail"
-        placeholder="Email..." value={this.state.inputEmailValue}
-        onChange={(e)=>this.handleEmailChange(e)}
-      />
-      <Button
-        inverse={true}
+      <div className="validatedField">
+        <input
+          type="text"
+          name="userName"
+          placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}
+        />
+        <WarningValidateEmail isHidden={this.state.mailWarning}/>
+      </div>
+
+      <div className="validatedField">
+        <input
+          type="text"
+          name="userEmail"
+          placeholder="Email..." value={this.state.inputEmailValue}
+          onChange={(e)=>this.handleEmailChange(e)}
+        />
+        <WarningValidateEmail isHidden={this.state.nameWarning}/>
+      </div>
+
+      <Button inverse={false}
+        listLimitExceeded={this.props.listLimitExceeded}
         handleClick={this.handleSubmit}
         text="Submit"
       />
@@ -157,8 +207,6 @@ class InputUser extends React.Component {
           Reset fields
         </a>
       </div>
-      <WarningValidateEmail isHidden={this.state.nameWarning}/>
-      <WarningValidateEmail isHidden={this.state.mailWarning}/>
     </div>
   }
 }
@@ -182,16 +230,15 @@ export class Navigation extends React.Component {
   }
 
   render(){
-    // console.log("Navigation", this.state);
+    console.log("Navigation", this.state);
     if (this.state.displayInput) {
       return <div className="addForm">
         <InputUser
           currentID={this.state.currentID}
 
-          addNewRecord={this.addNewRecord}
+          addNewRecord={this.props.addNewRecord}
           handleDisplayInput={this.handleDisplayInput}
-          handleUserAddedSuccess={this.handleUserAddedSuccess}
-          listLimitExceeded={this.listLimitExceeded}
+          listLimitExceeded={this.props.listLimitExceeded}
         />
       </div>
     } else {
@@ -199,10 +246,10 @@ export class Navigation extends React.Component {
         <AddUserButton
           inverse={false}
 
-          checkUserAddedSuccess={this.checkUserAddedSuccess}
+          userAddedSuccess={this.props.userAddedSuccess}
           handleDisplayInput={this.handleDisplayInput}
-          handleUserAddedSuccess={this.handleUserAddedSuccess}
-          listLimitExceeded={this.listLimitExceeded}
+          handleUserAddedSuccess={this.props.handleUserAddedSuccess}
+          listLimitExceeded={this.props.listLimitExceeded}
         />
       </div>
     }

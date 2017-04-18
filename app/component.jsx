@@ -18,15 +18,16 @@ export class Domain extends React.Component {
 
 export class SuccessMessage extends React.Component {
   render() {
-    return <div className="success">
+    return <div className={`message ${this.props.isHidden}`}>
       You have Successfully added an user.
   </div>
   }
 }
 
-export class WarningMessage extends React.Component {
+export class LimitExceededMessage extends React.Component {
   render() {
-    return <div className="warning">
+    console.log(this.props);
+    return <div className={`message ${this.props.isHidden}`}>
       You can't add new user because of a limit.
   </div>
   }
@@ -34,7 +35,7 @@ export class WarningMessage extends React.Component {
 
 export class WarningValidateEmail extends React.Component {
   render() {
-    return <div id="emailWarning">
+    return <div className={`validate ${this.props.isHidden}`}>
       Please input a valid email.
   </div>
   }
@@ -42,7 +43,7 @@ export class WarningValidateEmail extends React.Component {
 
 export class WarningValidateName extends React.Component {
   render() {
-    return <div id="nameWarning">
+    return <div className={`validate ${this.props.isHidden}`}>
       Please name not longer than 20 characters.
   </div>
   }
