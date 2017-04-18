@@ -44,7 +44,7 @@ export class WarningValidateEmail extends React.Component {
 export class WarningValidateName extends React.Component {
   render() {
     return <div className={`validate ${this.props.isHidden}`}>
-      Please name not longer than 20 characters.
+      Please input your name (max 20 letters)
   </div>
   }
 }

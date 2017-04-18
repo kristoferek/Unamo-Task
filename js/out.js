@@ -6832,7 +6832,7 @@ var WarningValidateName = exports.WarningValidateName = function (_React$Compone
       return _react2.default.createElement(
         "div",
         { className: "validate " + this.props.isHidden },
-        "Please name not longer than 20 characters."
+        "Please input your name (max 20 letters)"
       );
     }
   }]);
@@ -10209,12 +10209,6 @@ var Button = exports.Button = function (_React$Component) {
     return _this;
   }
 
-  // componentWillMount() {
-  //   this.setState({
-  //     buttonDisable: this.props.listLimitExceeded(),
-  //   })
-  // }
-
   _createClass(Button, [{
     key: 'componentWillReceiveProps',
     value: function componentWillReceiveProps(nextProps) {
@@ -10358,14 +10352,14 @@ var InputUser = function (_React$Component3) {
     _this3.handleSubmit = function (event) {
       event.preventDefault();
 
-      // Toggle input email validation
-      var incorrectEmail = _this3.state.inputEmailValue.indexOf("@") < 0;
+      // Toggle input email validation result state
+      var incorrectEmail = !_this3.validEmail(_this3.state.inputEmailValue);
       _this3.setState({
         mailWarning: incorrectEmail ? "" : "hidden"
       });
 
-      // Toggle input name validation
-      var incorrectName = _this3.state.inputNameValue.length > 20 || _this3.state.inputNameValue.length < 1;
+      // Toggle input name validation result state
+      var incorrectName = !_this3.validName(_this3.state.inputNameValue);
       _this3.setState({
         nameWarning: incorrectName ? "" : "hidden"
       });
@@ -10402,10 +10396,38 @@ var InputUser = function (_React$Component3) {
   // Handle reset link
 
 
-  // Handle Submit button
-
-
   _createClass(InputUser, [{
+    key: 'validEmail',
+
+
+    // Validates email
+    value: function validEmail(email) {
+      var regEx = new RegExp(/\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/);
+      if (email != "") {
+        if (regEx.test(email)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Validates email
+
+  }, {
+    key: 'validName',
+    value: function validName(name) {
+      var regEx = new RegExp(/\[a-zA-z]+(\s\([a-zA-z])*/);
+      if (name != "") {
+        if (regEx.test(name)) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    // Handle Submit button
+
+  }, {
     key: 'render',
     value: function render() {
       var _this4 = this;
@@ -10423,7 +10445,7 @@ var InputUser = function (_React$Component3) {
               return _this4.handleNameChange(e);
             }
           }),
-          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
+          _react2.default.createElement(_component.WarningValidateName, { isHidden: this.state.nameWarning })
         ),
         _react2.default.createElement(
           'div',
@@ -10436,7 +10458,7 @@ var InputUser = function (_React$Component3) {
               return _this4.handleEmailChange(e);
             }
           }),
-          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.nameWarning })
+          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
         ),
         _react2.default.createElement(Button, { inverse: false,
           listLimitExceeded: this.props.listLimitExceeded,

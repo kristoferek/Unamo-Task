@@ -18,12 +18,6 @@ export class Button extends React.Component {
     }
   }
 
-  // componentWillMount() {
-  //   this.setState({
-  //     buttonDisable: this.props.listLimitExceeded(),
-  //   })
-  // }
-
   componentWillReceiveProps(nextProps) {
     this.setState({
       buttonDisable: this.props.listLimitExceeded(),
@@ -147,18 +141,40 @@ class InputUser extends React.Component {
     })
   }
 
+  // Validates email
+  validEmail(email) {
+    var regEx = new RegExp(/\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/);
+    if (email != "") {
+      if (regEx.test(email)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  // Validates email
+  validName(name) {
+    var regEx = new RegExp(/\[a-zA-z]+(\s\([a-zA-z])*/);
+    if (name != "") {
+      if (regEx.test(name)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   // Handle Submit button
   handleSubmit = (event) => {
     event.preventDefault();
 
-    // Toggle input email validation
-    let incorrectEmail = this.state.inputEmailValue.indexOf("@") < 0;
+    // Toggle input email validation result state
+    let incorrectEmail = !this.validEmail(this.state.inputEmailValue);
     this.setState({
       mailWarning: incorrectEmail ? "" : "hidden"
     })
 
-    // Toggle input name validation
-    let incorrectName = this.state.inputNameValue.length > 20 || this.state.inputNameValue.length < 1 ;
+    // Toggle input name validation result state
+    let incorrectName = !this.validName(this.state.inputNameValue);
     this.setState({
       nameWarning: incorrectName ? "" : "hidden"
     })
@@ -184,7 +200,7 @@ class InputUser extends React.Component {
           name="userName"
           placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}
         />
-        <WarningValidateEmail isHidden={this.state.mailWarning}/>
+        <WarningValidateName isHidden={this.state.nameWarning}/>
       </div>
 
       <div className="validatedField">
@@ -194,7 +210,7 @@ class InputUser extends React.Component {
           placeholder="Email..." value={this.state.inputEmailValue}
           onChange={(e)=>this.handleEmailChange(e)}
         />
-        <WarningValidateEmail isHidden={this.state.nameWarning}/>
+        <WarningValidateEmail isHidden={this.state.mailWarning}/>
       </div>
 
       <Button inverse={false}
