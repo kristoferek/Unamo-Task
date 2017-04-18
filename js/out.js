@@ -9848,7 +9848,14 @@ var UsersTable = function (_React$Component3) {
           )
         ));
       });
-      return rows;
+      var noUsers = _react2.default.createElement(
+        'td',
+        { colSpan: 4, className: 'emptyTable' },
+        'This list is empty. ',
+        _react2.default.createElement('br', null),
+        'Please add some users!'
+      );
+      return rows.length == 0 ? noUsers : rows;
     };
 
     return _this3;

@@ -48,7 +48,11 @@ class UsersTable extends React.Component {
         </td>
       </tr>);
     });
-    return rows;
+    const noUsers = <td colSpan={4} className="emptyTable">
+      This list is empty. <br />
+      Please add some users!
+    </td>;
+    return rows.length==0 ? noUsers : rows;
   }
 
   render(){
