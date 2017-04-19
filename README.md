@@ -1,4 +1,6 @@
 # Unamo-Task by Krzysztof Michał Nowak
 
-### React
+### React, scss, flex
+
+http://username.github.io/projectName/ 
 
