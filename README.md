@@ -2,5 +2,6 @@
 
 ### React, scss, flex
 
-http://kristoferekuku.github.io/Unamo-Task/ 
+Working copy:
+http://kristoferek.github.io/Unamo-Task/ 
 
