@@ -6712,7 +6712,11 @@ var Logo = exports.Logo = function (_React$Component) {
       return _react2.default.createElement(
         "div",
         { className: "logo" },
-        _react2.default.createElement("img", null)
+        _react2.default.createElement(
+          "a",
+          { href: "http://www.positionly.com" },
+          _react2.default.createElement("img", { src: "./images/logo.png" })
+        )
       );
     }
   }]);
@@ -6762,7 +6766,12 @@ var SuccessMessage = exports.SuccessMessage = function (_React$Component3) {
       return _react2.default.createElement(
         "div",
         { className: "message " + this.props.isHidden },
-        "You have Successfully added an user."
+        _react2.default.createElement("img", { src: "./images/success.png" }),
+        _react2.default.createElement(
+          "div",
+          null,
+          "You have Successfully added an user."
+        )
       );
     }
   }]);
@@ -6786,7 +6795,12 @@ var LimitExceededMessage = exports.LimitExceededMessage = function (_React$Compo
       return _react2.default.createElement(
         "div",
         { className: "message " + this.props.isHidden },
-        "You can't add new user because of a limit."
+        _react2.default.createElement("img", { src: "./images/warning.png" }),
+        _react2.default.createElement(
+          "div",
+          null,
+          "You can't add new user because of a limit."
+        )
       );
     }
   }]);
@@ -6808,7 +6822,7 @@ var WarningValidateEmail = exports.WarningValidateEmail = function (_React$Compo
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { className: "validate " + this.props.isHidden },
+        { className: "warning " + this.props.isHidden },
         "Please input a valid email."
       );
     }
@@ -6831,7 +6845,7 @@ var WarningValidateName = exports.WarningValidateName = function (_React$Compone
     value: function render() {
       return _react2.default.createElement(
         "div",
-        { className: "validate " + this.props.isHidden },
+        { className: "warning " + this.props.isHidden },
         "Please input your name (max 20 letters)"
       );
     }
@@ -9823,7 +9837,11 @@ var UsersTable = function (_React$Component3) {
           _react2.default.createElement(
             'td',
             null,
-            index + 1
+            _react2.default.createElement(
+              'div',
+              { className: 'lp' },
+              index + 1
+            )
           ),
           _react2.default.createElement(
             'td',
@@ -9838,13 +9856,9 @@ var UsersTable = function (_React$Component3) {
           _react2.default.createElement(
             'td',
             null,
-            _react2.default.createElement(
-              'div',
-              { className: 'remove', onClick: function onClick(e) {
-                  return _this3.props.removeRecord(event, index);
-                } },
-              'x'
-            )
+            _react2.default.createElement('img', { className: 'remove', src: './images/delete.png', onClick: function onClick(e) {
+                return _this3.props.removeRecord(event, index);
+              } })
           )
         ));
       });
@@ -10219,7 +10233,6 @@ var Button = exports.Button = function (_React$Component) {
   }, {
     key: 'render',
     value: function render() {
-      console.log("Button ", this.state);
       return _react2.default.createElement(
         'div',
         {
@@ -10301,10 +10314,9 @@ var AddUserButton = function (_React$Component2) {
   }, {
     key: 'render',
     value: function render() {
-      console.log("AddUserButton: ", this.state);
       return _react2.default.createElement(
         'div',
-        { className: 'AddUserButton' },
+        { className: 'addUserButton' },
         _react2.default.createElement(Button, { icon: '+', inverse: false,
           listLimitExceeded: this.props.listLimitExceeded,
           handleClick: this.handleSubmit,
@@ -10353,15 +10365,18 @@ var InputUser = function (_React$Component3) {
       event.preventDefault();
 
       // Toggle input email validation result state
-      var incorrectEmail = !_this3.validEmail(_this3.state.inputEmailValue);
+      var incorrectEmail = !_this3.validateEmail(_this3.state.inputEmailValue);
       _this3.setState({
-        mailWarning: incorrectEmail ? "" : "hidden"
+        mailWarningDisplay: incorrectEmail ? "" : "hidden",
+        validMail: incorrectEmail ? false : true
       });
 
       // Toggle input name validation result state
-      var incorrectName = !_this3.validName(_this3.state.inputNameValue);
+      var incorrectName = !_this3.validateName(_this3.state.inputNameValue);
+      console.log("incorrectName: ", incorrectName);
       _this3.setState({
-        nameWarning: incorrectName ? "" : "hidden"
+        nameWarningDisplay: incorrectName ? "" : "hidden",
+        validName: incorrectName ? false : true
       });
 
       // If email and name inputs are correct add user to list
@@ -10381,8 +10396,10 @@ var InputUser = function (_React$Component3) {
       currentID: _this3.props.currentID + 1,
       inputNameValue: "",
       inputEmailValue: "",
-      mailWarning: "hidden",
-      nameWarning: "hidden"
+      mailWarningDisplay: "hidden",
+      nameWarningDisplay: "hidden",
+      validMail: true,
+      validName: true
     };
     return _this3;
   }
@@ -10397,11 +10414,11 @@ var InputUser = function (_React$Component3) {
 
 
   _createClass(InputUser, [{
-    key: 'validEmail',
+    key: 'validateEmail',
 
 
     // Validates email
-    value: function validEmail(email) {
+    value: function validateEmail(email) {
       var regEx = new RegExp(/\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/);
       if (email != "") {
         if (regEx.test(email)) {
@@ -10411,16 +10428,14 @@ var InputUser = function (_React$Component3) {
       return false;
     }
 
-    // Validates email
+    // Validates name
 
   }, {
-    key: 'validName',
-    value: function validName(name) {
-      var regEx = new RegExp(/\[a-zA-z]+(\s\([a-zA-z])*/);
-      if (name != "") {
-        if (regEx.test(name)) {
-          return true;
-        }
+    key: 'validateName',
+    value: function validateName(name) {
+      var regEx = new RegExp(/^[a-zA-Z]+([ ][a-zA-Z]+)*[a-zA-Z]*$/g);
+      if (name != "" && name.length < 21) {
+        return regEx.test(name);
       }
       return false;
     }
@@ -10437,37 +10452,36 @@ var InputUser = function (_React$Component3) {
         { className: 'inputUser' },
         _react2.default.createElement(
           'div',
-          { className: 'validatedField' },
+          { className: 'validateField ' + (this.state.validName ? "" : "validate") },
           _react2.default.createElement('input', {
             type: 'text',
             name: 'userName',
             placeholder: 'Name...', value: this.state.inputNameValue, onChange: function onChange(e) {
               return _this4.handleNameChange(e);
-            }
-          }),
-          _react2.default.createElement(_component.WarningValidateName, { isHidden: this.state.nameWarning })
+            },
+            autoFocus: true }),
+          _react2.default.createElement(_component.WarningValidateName, { isHidden: this.state.nameWarningDisplay })
         ),
         _react2.default.createElement(
           'div',
-          { className: 'validatedField' },
+          { className: 'validateField ' + (this.state.validMail ? "" : "validate") },
           _react2.default.createElement('input', {
             type: 'text',
             name: 'userEmail',
             placeholder: 'Email...', value: this.state.inputEmailValue,
             onChange: function onChange(e) {
               return _this4.handleEmailChange(e);
-            }
-          }),
-          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarning })
+            } }),
+          _react2.default.createElement(_component.WarningValidateEmail, { isHidden: this.state.mailWarningDisplay })
         ),
-        _react2.default.createElement(Button, { inverse: false,
+        _react2.default.createElement(Button, { inverse: true,
           listLimitExceeded: this.props.listLimitExceeded,
           handleClick: this.handleSubmit,
           text: 'Submit'
         }),
         _react2.default.createElement(
           'div',
-          { id: 'reset' },
+          { className: 'reset' },
           _react2.default.createElement(
             'a',
             { href: '#', onClick: this.handleInputReset },
@@ -10516,7 +10530,7 @@ var Navigation = exports.Navigation = function (_React$Component4) {
       if (this.state.displayInput) {
         return _react2.default.createElement(
           'div',
-          { className: 'addForm' },
+          { className: 'row addForm' },
           _react2.default.createElement(InputUser, {
             currentID: this.state.currentID,
 
@@ -10528,7 +10542,7 @@ var Navigation = exports.Navigation = function (_React$Component4) {
       } else {
         return _react2.default.createElement(
           'div',
-          { className: 'addForm' },
+          { className: 'row addForm' },
           _react2.default.createElement(AddUserButton, {
             inverse: false,
 
@@ -10551,10 +10565,10 @@ var Navigation = exports.Navigation = function (_React$Component4) {
 
 exports = module.exports = __webpack_require__(89)();
 // imports
-
+exports.push([module.i, "@import url(https://fonts.googleapis.com/css?family=Roboto:400,600,700&subset=latin-ext);", ""]);
 
 // module
-exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  border: none;\n  color: black;\n  background-color: white;\n  text-decoration: none; }\n\nbody {\n  font-family: Arial, Helvetica, sans-serif;\n  font-size: 14px;\n  line-height: 1.47; }\n\n.hidden {\n  display: none; }\n\n.button {\n  height: 40px;\n  width: 150px;\n  display: flex;\n  justify-content: center;\n  align-items: center;\n  border-radius: 5px;\n  border: solid 2px #0aab6b;\n  background-color: white;\n  color: #0aab6b; }\n  .button .text {\n    color: #0aab6b;\n    background-color: white;\n    font-weight: 700; }\n  .button .icon {\n    width: 20px;\n    height: 20px;\n    color: white;\n    background-color: #0aab6b;\n    text-align: center;\n    font-size: 20px;\n    line-height: 20px;\n    margin-right: 10px;\n    border-radius: 50%; }\n  .button.inverse {\n    border: solid 2px white;\n    background-color: #0aab6b;\n    color: white; }\n    .button.inverse .text {\n      color: white;\n      background-color: #0aab6b;\n      font-weight: 700; }\n    .button.inverse .icon {\n      color: #0aab6b;\n      background-color: white; }\n  .button.disabled {\n    background: white;\n    color: lightgray;\n    border: solid 2px lightGray; }\n    .button.disabled .text {\n      color: lightgray;\n      background-color: white;\n      font-weight: 700; }\n    .button.disabled .icon {\n      color: white;\n      background-color: lightgray; }\n", ""]);
+exports.push([module.i, "* {\n  margin: 0;\n  padding: 0;\n  box-sizing: border-box;\n  text-decoration: none; }\n\nbody {\n  font-family: 'Roboto', sans-serif;\n  font-size: 14px;\n  line-height: 1.47;\n  border: none;\n  color: #6f7f85;\n  background-color: #e8eceb; }\n\na {\n  color: #0aab6b; }\n  a:visited {\n    color: #0aab6b; }\n  a:hover {\n    color: #0ddb89; }\n  a:active {\n    color: #59f5b7;\n    font-weight: 700; }\n\n.hidden {\n  display: none; }\n\n.container {\n  width: 100%;\n  max-width: 960px;\n  margin: 0 auto;\n  background-color: #e8eceb; }\n\n.row {\n  width: 100%;\n  min-height: 1px; }\n\n.header, .footer {\n  height: 120px; }\n\n.header {\n  display: flex;\n  justify-content: space-between;\n  align-items: center; }\n  .header .logo {\n    width: 160px;\n    height: 55px; }\n    .header .logo:hover {\n      opacity: 0.7; }\n  .header .domain {\n    font-weight: 700; }\n\n.userList {\n  border-radius: 3px 3px;\n  box-shadow: 0px 1px 1px #6f7f85; }\n  .userList .addForm {\n    border-top-left-radius: 3px 3px;\n    border-top-right-radius: 3px 3px;\n    padding: 20px;\n    background-color: white; }\n    .userList .addForm .button {\n      min-height: 40px;\n      width: 150px;\n      margin: 0 5px;\n      display: flex;\n      justify-content: center;\n      align-items: center;\n      border-radius: 3px;\n      border: solid 1px #0aab6b;\n      background-color: white;\n      cursor: pointer; }\n      .userList .addForm .button .text {\n        color: #0aab6b;\n        background-color: white;\n        font-size: 1.2em;\n        font-weight: 700; }\n      .userList .addForm .button .icon {\n        width: 20px;\n        height: 20px;\n        color: white;\n        background-color: #0aab6b;\n        text-align: center;\n        font-size: 20px;\n        line-height: 20px;\n        margin-right: 5px;\n        border-radius: 50%; }\n      .userList .addForm .button.inverse {\n        border: solid 2px white;\n        background-color: #0aab6b;\n        color: white; }\n        .userList .addForm .button.inverse .text {\n          color: white;\n          background-color: #0aab6b;\n          font-weight: 700; }\n        .userList .addForm .button.inverse .icon {\n          color: #0aab6b;\n          background-color: white; }\n      .userList .addForm .button.disabled {\n        background: white;\n        color: lightgray;\n        border: solid 2px lightGray; }\n        .userList .addForm .button.disabled .text {\n          color: lightgray;\n          background-color: white;\n          font-weight: 700; }\n        .userList .addForm .button.disabled .icon {\n          color: white;\n          background-color: lightgray; }\n    .userList .addForm .addUserButton {\n      border-top-left-radius: 3px 3px;\n      border-top-right-radius: 3px 3px;\n      display: flex;\n      justify-content: flex-start;\n      flex-wrap: wrap;\n      align-items: center; }\n      .userList .addForm .addUserButton .message {\n        align-items: center;\n        margin-left: 25px;\n        display: flex; }\n        .userList .addForm .addUserButton .message img {\n          width: 20px;\n          height: 20px;\n          margin-right: 10px; }\n        .userList .addForm .addUserButton .message div {\n          max-width: 300px;\n          color: black;\n          font-weight: 700; }\n        .userList .addForm .addUserButton .message.hidden {\n          display: none; }\n    .userList .addForm .inputUser {\n      display: flex;\n      justify-content: flex-start;\n      align-items: center;\n      flex-wrap: wrap; }\n      .userList .addForm .inputUser .validateField {\n        margin: 0 5px;\n        position: relative; }\n        .userList .addForm .inputUser .validateField.validate input {\n          border: solid 1px red; }\n        .userList .addForm .inputUser .validateField input {\n          width: 250px;\n          height: 40px;\n          padding: 12px;\n          border-radius: 5px;\n          border: solid 2px #e8eceb;\n          background-color: white;\n          font-size: 16px;\n          font-weight: 600;\n          color: #6f7f85; }\n        .userList .addForm .inputUser .validateField .warning {\n          margin-top: 4px;\n          position: absolute;\n          font-size: 10px;\n          color: red; }\n      .userList .addForm .inputUser .reset {\n        margin-left: 15px; }\n        .userList .addForm .inputUser .reset a {\n          color: red;\n          text-decoration: underline; }\n          .userList .addForm .inputUser .reset a:visited {\n            color: red; }\n          .userList .addForm .inputUser .reset a:hover {\n            color: #ff9999; }\n          .userList .addForm .inputUser .reset a:active {\n            color: #ff9999;\n            font-weight: 600; }\n  .userList table {\n    width: 100%;\n    border: 0;\n    border: none;\n    border-spacing: 0;\n    text-align: left;\n    background-color: #f8f9f9;\n    border-bottom-left-radius: 3px 3px;\n    border-bottom-right-radius: 3px 3px; }\n  .userList td, .userList th {\n    padding: 15px 25px; }\n    .userList td:nth-child(1), .userList th:nth-child(1) {\n      width: 19%; }\n    .userList td:nth-child(2), .userList th:nth-child(2) {\n      width: 28%; }\n    .userList td:nth-child(3), .userList th:nth-child(3) {\n      width: 46%; }\n  .userList th {\n    padding: 7px 25px; }\n  .userList thead {\n    background-color: #e8eceb;\n    font-size: 12px;\n    font-weight: 600; }\n  .userList tbody tr {\n    border-bottom-left-radius: 3px 3px;\n    border-bottom-right-radius: 3px 3px; }\n    .userList tbody tr:nth-child(2n) {\n      background-color: white; }\n    .userList tbody tr:last-child td:first-child {\n      border-bottom-left-radius: 3px 3px; }\n    .userList tbody tr:last-child td:last-child {\n      border-bottom-right-radius: 3px 3px; }\n  .userList .lp {\n    width: 20px;\n    height: 20px;\n    color: #6f7f85;\n    background-color: #e8eceb;\n    text-align: center;\n    font-size: 12px;\n    font-weight: 700;\n    line-height: 12px;\n    padding: 4px 0;\n    margin-right: 0 auto;\n    border-radius: 50%; }\n  .userList img.remove {\n    padding-top: 3px;\n    cursor: pointer; }\n  .userList .emptyTable {\n    font-size: 1.5em;\n    text-align: center; }\n", ""]);
 
 // exports
 

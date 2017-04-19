@@ -35,7 +35,7 @@ class UsersTable extends React.Component {
     array.forEach((user, index) =>{
       rows.push(<tr key={index} id={index}>
         <td>
-          {index+1}
+          <div className="lp">{index+1}</div>
         </td>
         <td>
           {user.name}
@@ -44,7 +44,7 @@ class UsersTable extends React.Component {
           {user.email}
         </td>
         <td>
-          <div className="remove" onClick={(e)=>this.props.removeRecord(event, index)}>x</div>
+          <img className="remove" src="./images/delete.png" onClick={(e)=>this.props.removeRecord(event, index)}/>
         </td>
       </tr>);
     });

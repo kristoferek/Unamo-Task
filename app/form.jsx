@@ -32,7 +32,6 @@ export class Button extends React.Component {
   }
 
   render() {
-    console.log("Button ", this.state);
     return <div
       className={this.setClass()}
       onClick={this.state.buttonDisable ? null : this.props.handleClick}>
@@ -93,8 +92,7 @@ class AddUserButton extends React.Component {
   }
 
   render(){
-    console.log("AddUserButton: ", this.state);
-    return <div className="AddUserButton">
+    return <div className="addUserButton">
       <Button icon="+" inverse={false}
         listLimitExceeded={this.props.listLimitExceeded}
         handleClick={this.handleSubmit}
@@ -114,8 +112,10 @@ class InputUser extends React.Component {
       currentID: this.props.currentID + 1,
       inputNameValue: "",
       inputEmailValue: "",
-      mailWarning: "hidden",
-      nameWarning: "hidden",
+      mailWarningDisplay: "hidden",
+      nameWarningDisplay: "hidden",
+      validMail: true,
+      validName: true,
     };
   }
 
@@ -142,7 +142,7 @@ class InputUser extends React.Component {
   }
 
   // Validates email
-  validEmail(email) {
+  validateEmail(email) {
     var regEx = new RegExp(/\w+([-+.']\w+)*@\w+([-.]\w+)*\.\w+([-.]\w+)*/);
     if (email != "") {
       if (regEx.test(email)) {
@@ -152,13 +152,11 @@ class InputUser extends React.Component {
     return false;
   }
 
-  // Validates email
-  validName(name) {
-    var regEx = new RegExp(/\[a-zA-z]+(\s\([a-zA-z])*/);
-    if (name != "") {
-      if (regEx.test(name)) {
-        return true;
-      }
+  // Validates name
+  validateName(name) {
+    var regEx = new RegExp(/^[a-zA-Z]+([ ][a-zA-Z]+)*[a-zA-Z]*$/g);
+    if ((name != "")&&(name.length<21)) {
+      return regEx.test(name);
     }
     return false;
   }
@@ -168,15 +166,18 @@ class InputUser extends React.Component {
     event.preventDefault();
 
     // Toggle input email validation result state
-    let incorrectEmail = !this.validEmail(this.state.inputEmailValue);
+    let incorrectEmail = !this.validateEmail(this.state.inputEmailValue);
     this.setState({
-      mailWarning: incorrectEmail ? "" : "hidden"
+      mailWarningDisplay: incorrectEmail ? "" : "hidden",
+      validMail: incorrectEmail ? false : true,
     })
 
     // Toggle input name validation result state
-    let incorrectName = !this.validName(this.state.inputNameValue);
+    let incorrectName = !this.validateName(this.state.inputNameValue);
+    console.log("incorrectName: ",incorrectName);
     this.setState({
-      nameWarning: incorrectName ? "" : "hidden"
+      nameWarningDisplay: incorrectName ? "" : "hidden",
+      validName: incorrectName ? false : true,
     })
 
     // If email and name inputs are correct add user to list
@@ -194,31 +195,30 @@ class InputUser extends React.Component {
 
   render(){
     return <div className="inputUser">
-      <div className="validatedField">
+      <div className={`validateField ${this.state.validName ? "" : "validate"}`}>
         <input
           type="text"
           name="userName"
           placeholder="Name..." value={this.state.inputNameValue} onChange={(e)=>this.handleNameChange(e)}
-        />
-        <WarningValidateName isHidden={this.state.nameWarning}/>
+          autoFocus/>
+        <WarningValidateName isHidden={this.state.nameWarningDisplay}/>
       </div>
 
-      <div className="validatedField">
+      <div className={`validateField ${this.state.validMail ? "" : "validate"}`}>
         <input
           type="text"
           name="userEmail"
           placeholder="Email..." value={this.state.inputEmailValue}
-          onChange={(e)=>this.handleEmailChange(e)}
-        />
-        <WarningValidateEmail isHidden={this.state.mailWarning}/>
+          onChange={(e)=>this.handleEmailChange(e)} />
+        <WarningValidateEmail isHidden={this.state.mailWarningDisplay}/>
       </div>
 
-      <Button inverse={false}
+      <Button inverse={true}
         listLimitExceeded={this.props.listLimitExceeded}
         handleClick={this.handleSubmit}
         text="Submit"
       />
-      <div id="reset">
+    <div className="reset">
         <a href="#" onClick={this.handleInputReset}>
           Reset fields
         </a>
@@ -248,7 +248,7 @@ export class Navigation extends React.Component {
   render(){
     console.log("Navigation", this.state);
     if (this.state.displayInput) {
-      return <div className="addForm">
+      return <div className="row addForm">
         <InputUser
           currentID={this.state.currentID}
 
@@ -258,7 +258,7 @@ export class Navigation extends React.Component {
         />
       </div>
     } else {
-      return <div className="addForm">
+      return <div className="row addForm">
         <AddUserButton
           inverse={false}
 

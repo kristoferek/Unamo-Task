@@ -1,79 +1,279 @@
+@import url('https://fonts.googleapis.com/css?family=Roboto:400,600,700&subset=latin-ext');
 // reset
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  border: none;
-  color: black;
-  background-color: white;
   text-decoration: none;
 }
 
+$color-text: #6f7f85;
+$color-primary: #0aab6b;
+$gray: #e8eceb;
+$lightgray: #f8f9f9;
+$border-radius: 3px;
+
 body{
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Roboto', sans-serif;
   font-size: 14px;
   line-height: 1.47;
+  border: none;
+  color: $color-text;
+  background-color: $gray;
+}
+
+a {
+  color: $color-primary;
+  &:visited{
+    color: $color-primary;
+  }
+  &:hover{
+    color: lighten($color-primary, 10%);
+  }
+  &:active{
+    color: lighten($color-primary, 30%);
+    font-weight: 700;
+  }
 }
 
 .hidden{
   display: none;
 }
 
-$primary: #0aab6b;
-$gray: #e8eceb;
+.container{
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  background-color: $gray;
+}
+.row{
+    width: 100%;
+    min-height: 1px;
+}
 
-.button{
-  height: 40px;
-  width: 150px;
+.header, .footer{
+  height: 120px;
+}
+
+.header{
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  border-radius: 5px;
-  border: solid 2px $primary;
-  background-color: white;
-  color: $primary;
-  .text{
-    color: $primary;
-    background-color: white;
+  .logo{
+    width: 160px;
+    height: 55px;
+    &:hover{
+    opacity: 0.7;
+    }
+  }
+  .domain{
     font-weight: 700;
   }
-  .icon{
+}
+
+.userList{
+  border-radius: $border-radius $border-radius;
+  box-shadow: 0px 1px 1px $color-text;
+  .addForm{
+    border-top-left-radius: $border-radius $border-radius;
+    border-top-right-radius: $border-radius $border-radius;
+    padding: 20px;
+    background-color: white;
+    .button{
+      min-height: 40px;
+      width: 150px;
+      margin: 0 5px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: $border-radius;
+      border: solid 1px $color-primary;
+      background-color: white;
+      cursor: pointer;
+      .text{
+        color: $color-primary;
+        background-color: white;
+        font-size: 1.2em;
+        font-weight: 700;
+      }
+      .icon{
+        width: 20px;
+        height: 20px;
+        color: white;
+        background-color: $color-primary;
+        text-align: center;
+        font-size: 20px;
+        line-height: 20px;
+        margin-right: 5px;
+        border-radius: 50%;
+      }
+      &.inverse{
+        border: solid 2px white;
+        background-color: $color-primary;
+        color: white;
+        .text{
+          color: white;
+          background-color: $color-primary;
+          font-weight: 700;
+        }
+        .icon{
+          color: $color-primary;
+          background-color: white;
+        }
+      }
+      &.disabled{
+        background: white;
+        color: lightgray;
+        border: solid 2px lightGray;
+        .text{
+          color: lightgray;
+          background-color: white;
+          font-weight: 700;
+        }
+        .icon{
+          color: white;
+          background-color: lightgray;
+        }
+      }
+    }
+    .addUserButton{
+      border-top-left-radius: $border-radius $border-radius;
+      border-top-right-radius: $border-radius $border-radius;
+      display: flex;
+      justify-content: flex-start;
+      flex-wrap: wrap;
+      align-items: center;
+      .message{
+        align-items: center;
+        margin-left: 25px;
+        display: flex;
+        img{
+          width: 20px;
+          height: 20px;
+          margin-right: 10px;
+        }
+        div{
+          max-width: 300px;
+          color: black;
+          font-weight: 700;
+        }
+        &.hidden{
+          display: none;
+        }
+      }
+    }
+    .inputUser{
+      display: flex;
+      justify-content: flex-start;
+      align-items: center;
+      flex-wrap: wrap;
+      .validateField{
+        margin: 0 5px;
+        position: relative;
+        &.validate input{
+          border: solid 1px red;
+        }
+        input{
+          width: 250px;
+          height: 40px;
+          padding: 12px;
+          border-radius: 5px;
+          border: solid 2px $gray;
+          background-color: white;
+          font-size: 16px;
+          font-weight: 600;
+          color: $color-text;
+        }
+        .warning{
+          margin-top: 4px;
+          position: absolute;
+          font-size: 10px;
+          color: red;
+        }
+      }
+      .reset{
+        margin-left: 15px;
+        a {
+          color: red;
+          text-decoration: underline;
+          &:visited{
+            color: red;
+          }
+          &:hover{
+            color: lighten(red, 30%);
+          }
+          &:active{
+            color: lighten(red, 30%);
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+  table{
+    width: 100%;
+    border: 0;
+    border: none;
+    border-spacing: 0;
+    text-align: left;
+    background-color: $lightgray;
+    border-bottom-left-radius: $border-radius $border-radius;
+    border-bottom-right-radius: $border-radius $border-radius;
+  }
+  td, th{
+    padding: 15px 25px;
+    &:nth-child(1){
+      width: 19%;
+    }
+    &:nth-child(2){
+      width: 28%;
+    }
+    &:nth-child(3){
+      width: 46%;
+    }
+  }
+  th{
+    padding: 7px 25px;
+  }
+  thead{
+    background-color: $gray;
+    font-size: 12px;
+    font-weight: 600;
+  }
+  tbody tr{
+    border-bottom-left-radius: $border-radius $border-radius;
+    border-bottom-right-radius: $border-radius $border-radius;
+    &:nth-child(2n){
+      background-color: white;
+    }
+    &:last-child td{
+      &:first-child{
+        border-bottom-left-radius: $border-radius $border-radius;
+      }
+      &:last-child{
+        border-bottom-right-radius: $border-radius $border-radius;
+      }
+    }
+  }
+  .lp{
     width: 20px;
     height: 20px;
-    color: white;
-    background-color: $primary;
+    color: $color-text;
+    background-color: $gray;
     text-align: center;
-    font-size: 20px;
-    line-height: 20px;
-    margin-right: 10px;
+    font-size: 12px;
+    font-weight: 700;
+    line-height: 12px;
+    padding: 4px 0;
+    margin-right: 0 auto;
     border-radius: 50%;
   }
-  &.inverse{
-    border: solid 2px white;
-    background-color: $primary;
-    color: white;
-    .text{
-      color: white;
-      background-color: $primary;
-      font-weight: 700;
-    }
-    .icon{
-      color: $primary;
-      background-color: white;
-    }
+  img.remove{
+    padding-top: 3px;
+    cursor: pointer;
   }
-  &.disabled{
-    background: white;
-    color: lightgray;
-    border: solid 2px lightGray;
-    .text{
-      color: lightgray;
-      background-color: white;
-      font-weight: 700;
-    }
-    .icon{
-      color: white;
-      background-color: lightgray;
-    }
+  .emptyTable{
+    font-size: 1.5em;
+    text-align: center;
   }
 }
