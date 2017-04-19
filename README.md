@@ -2,5 +2,5 @@
 
 ### React, scss, flex
 
-http://username.github.io/projectName/ 
+http://kristoferekuku.github.io/Unamo-Task/ 
 
