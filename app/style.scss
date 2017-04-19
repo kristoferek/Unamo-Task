@@ -92,7 +92,7 @@ a {
       cursor: pointer;
       .text{
         color: $color-primary;
-        background-color: white;
+        background-color: none;
         font-size: 1.2em;
         font-weight: 700;
       }
@@ -113,27 +113,38 @@ a {
         color: white;
         .text{
           color: white;
-          background-color: $color-primary;
+          background-color: none;
           font-weight: 700;
         }
         .icon{
           color: $color-primary;
           background-color: white;
         }
+        &:hover{
+          background-color: darken($color-primary, 5%);
+        }
+
       }
       &.disabled{
         background: white;
         color: lightgray;
         border: solid 2px lightGray;
+        cursor: default;
         .text{
           color: lightgray;
-          background-color: white;
+          background-color: none;
           font-weight: 700;
         }
         .icon{
           color: white;
           background-color: lightgray;
         }
+        &:hover{
+          background-color: white;
+        }
+      }
+      &:hover{
+        background-color: lighten($color-primary,60%);
       }
     }
     .addUserButton{
