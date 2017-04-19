@@ -218,7 +218,7 @@ class InputUser extends React.Component {
         handleClick={this.handleSubmit}
         text="Submit"
       />
-    <div className="reset">
+      <div className={`reset ${(this.state.inputEmailValue + this.state.inputNameValue)==="" ? "hidden" : ""}`}>
         <a href="#" onClick={this.handleInputReset}>
           Reset fields
         </a>
